@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick and Morty</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6A11CB, #2575FC); /* Paleta original */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        input, button {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 1rem;
+            place-self: center;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+        }
+
+        button {
+            background: #FF5722;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background: #E64A19;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background: #D84315;
+            transform: scale(0.98);
+        }
+
+        /* Estilos para Resultados */
+        
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .resultados {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 900px;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        .character-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            width: 200px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .character-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .character-item img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .character-item h3 {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .character-item p {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .characters {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-height: 60vh;
+            margin-top: 3em;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+
+        <!-- Formulário -->
+        <form action="#" v-if="formVisibility" :style="{ display: formVisibility ? 'flex' : 'none' }">
+            <input v-model="characterRequested" type="text" placeholder="Digite o Personagem Aqui" @keyup.enter="reqToRickAndMortyApi">
+            <button type="button" @click="reqToRickAndMortyApi">Enviar!</button>
+        </form>
+
+        <!-- Resultados -->
+        <div class="characters" v-if="characters.length > 0" 
+            :style="{
+               boxShadow: formVisibility ? '0 4px 10px rgba(0, 0, 0, 0.3)' : 'none',
+               background: formVisibility ? 'rgba(255, 255, 255, 0.1)' : 'none'
+            }">
+            <h2>Resultados:</h2>
+            <div class="resultados">
+                <div class="character-item" v-for="character in characters" :key="character.id">
+                    <img :src="character.image" :alt="character.name">
+                    <h3>{{ character.name }}</h3>
+                    <p>{{ character.species }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                characterRequested: '',
+                characters: [],
+                formVisibility: true
+            },
+            methods: {
+                reqToRickAndMortyApi() {
+                    const url = 'https://rickandmortyapi.com/api/character';
+                    let characterRequested = this.characterRequested;
+
+                    if (!characterRequested) {
+                        alert('Digite um personagem');
+                        return;
+                    }
+
+                    fetch(`${url}/?name=${encodeURIComponent(characterRequested)}`)
+                        .then(r => {
+                            this.formVisibility = false;
+                            return r.json();
+                        })
+                        .then(data => {
+                            if (data.results.length == 0) {
+                                alert("Nenhum resultado encontrado!");
+                                return;
+                            }
+                            this.characters = [];
+                            data.results.forEach(element => {
+                                this.characters.push(element);
+                            });
+                        })
+                        .catch(err => {
+                            alert(`Falha ao buscar dados: ${err.message}`);
+                            this.formVisibility = true;  // Voltar o formulário
+                        });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
