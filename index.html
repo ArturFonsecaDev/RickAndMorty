@@ -12,7 +12,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- Passando as propriedades em kebab-case -->
         <form-search :form-visibility="formVisibility" :character-requested="characterRequested" @search="reqToRickAndMortyApi"></form-search>
         <character-results :characters="characters" :form-visibility="formVisibility"></character-results>
     </div>

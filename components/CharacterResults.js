@@ -5,9 +5,7 @@ export default {
   },
   data() {
     return {
-      // Número de itens por página
       itemsPerPage: 3,
-      // Página atual
       currentPage: 0
     };
   },
