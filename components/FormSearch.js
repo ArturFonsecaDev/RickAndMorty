@@ -22,6 +22,6 @@ export default {
     <form v-if="formVisibility" @submit.prevent="triggerSearch">
       <input v-model="localCharacterRequested" type="text" placeholder="Digite o Personagem Aqui" />
       <button type="button" @click="triggerSearch">Enviar!</button>
-    </form>
-  `
+    </form>`
 };
+// revisao
