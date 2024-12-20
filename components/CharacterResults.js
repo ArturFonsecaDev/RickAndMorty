@@ -51,13 +51,13 @@ export default {
       </div>
 
       <!-- Controles de navegação -->
-      <div class="pagination">
+      <div class="pagination" v-if="totalPages > 1">
         <button @click="previousPage" :disabled="currentPage == 0">Anterior</button>
         <button @click="nextPage" :disabled="currentPage == totalPages - 1">Próximo</button>
       </div>
 
       <!-- Paginação -->
-      <div class="page-numbers">
+      <div class="page-numbers" v-if="totalPages > 1">
         <button 
           v-for="(page, index) in totalPages" 
           :key="index" 
@@ -66,6 +66,5 @@ export default {
           {{ index + 1 }}
         </button>
       </div>
-    </div>
-  `
+    </div>`
 };
